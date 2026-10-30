@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Invbecs | Sistema de Gestão de Ativos</title>
+  <meta name="description"
+    content="Sistema completo de gerenciamento de inventário do setor de TI. Controle equipamentos, colaboradores e movimentações." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230f172a'/><rect x='15' y='30' width='70' height='45' rx='5' fill='none' stroke='%2306b6d4' stroke-width='6'/><line x1='30' y1='75' x2='70' y2='75' stroke='%2306b6d4' stroke-width='6'/><line x1='50' y1='75' x2='50' y2='85' stroke='%2306b6d4' stroke-width='6'/></svg>" />
+</head>
+
+<body class="auth-locked">
+  <!-- Tela de Login Segura -->
+  <div id="loginScreen" class="login-overlay">
+    <div class="login-card" id="loginCard">
+      <div class="login-header">
+        <div class="logo-icon" style="margin: 0 auto 12px; width: 48px; height: 48px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="3" width="20" height="14" rx="2" />
+            <path d="M8 21h8M12 17v4" />
+          </svg>
+        </div>
+        <h2>Invbecs</h2>
+        <p>Acesso Seguro ao Sistema de Gestão</p>
+      </div>
+
+      <!-- Aviso informativo de inatividade ou logout -->
+      <div id="loginNotice" class="login-notice-msg" style="display: none;"></div>
+
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label for="loginUser">Usuário</label>
+          <div class="input-with-icon">
+            <input type="text" id="loginUser" class="form-control" placeholder="Digite seu usuário" required autofocus
+              autocomplete="username" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="loginPass">Senha</label>
+          <div class="password-field-wrap">
+            <input type="password" id="loginPass" class="form-control" placeholder="Digite sua senha" required
+              autocomplete="current-password" />
+            <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('loginPass')" title="Mostrar/ocultar senha">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div id="loginError" class="login-error-msg" style="display: none;"></div>
+        <div id="loginLockout" class="login-lockout-msg" style="display: none;"></div>
+
+        <button type="submit" id="loginSubmitBtn" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 14px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+          Entrar no Sistema
+        </button>
+      </form>
+    </div>
+  </div>
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="3" width="20" height="14" rx="2" />
+            <path d="M8 21h8M12 17v4" />
+          </svg>
+        </div>
+        <div class="logo-text">
+          <span class="logo-title">Invbecs</span>
+          <span class="logo-subtitle">Gestão de Ativos</span>
+        </div>
+      </div>
+      <button class="sidebar-toggle" id="sidebarToggle" aria-label="Recolher menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M11 19l-7-7 7-7M18 19l-7-7 7-7" />
+        </svg>
+      </button>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Principal</div>
+      <a href="#" class="nav-item active" id="nav-dashboard" onclick="navigateTo('dashboard')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7" rx="1" />
+          <rect x="14" y="3" width="7" height="7" rx="1" />
+          <rect x="3" y="14" width="7" height="7" rx="1" />
+          <rect x="14" y="14" width="7" height="7" rx="1" />
+        </svg>
+        <span>Dashboard</span>
+      </a>
+      <a href="#" class="nav-item" id="nav-equipamentos" onclick="navigateTo('equipamentos')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="3" width="20" height="14" rx="2" />
+          <path d="M8 21h8M12 17v4" />
+        </svg>
+        <span>Equipamentos</span>
+        <span class="nav-badge" id="badge-equipamentos">0</span>
+      </a>
+      <a href="#" class="nav-item" id="nav-colaboradores" onclick="navigateTo('colaboradores')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>
+        <span>Colaboradores</span>
+        <span class="nav-badge" id="badge-colaboradores">0</span>
+      </a>
+      <a href="#" class="nav-item" id="nav-movimentacoes" onclick="navigateTo('movimentacoes')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+        </svg>
+        <span>Movimentações</span>
+      </a>
+
+      <div class="nav-section-label">Análises</div>
+      <a href="#" class="nav-item" id="nav-relatorios" onclick="navigateTo('relatorios')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+          <polyline points="14,2 14,8 20,8" />
+          <line x1="16" y1="13" x2="8" y2="13" />
+          <line x1="16" y1="17" x2="8" y2="17" />
+          <polyline points="10,9 9,9 8,9" />
+        </svg>
+        <span>Relatórios</span>
+      </a>
+      <a href="#" class="nav-item" id="nav-manutencao" onclick="navigateTo('manutencao')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path
+            d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+        </svg>
+        <span>Manutenção</span>
+      </a>
+
+      <div class="nav-section-label">Sistema</div>
+      <a href="#" class="nav-item" id="nav-configuracoes" onclick="navigateTo('configuracoes')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3" />
+          <path
+            d="M19.07 4.93l-1.41 1.41M6.34 17.66l-1.41 1.41M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M21 12h-2M5 12H3M12 21v-2M12 5V3" />
+        </svg>
+        <span>Configurações</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="userAvatarSidebar">A</div>
+        <div class="user-details">
+          <span class="user-name" id="userNameSidebar">Administrador</span>
+          <span class="user-role">TI Admin</span>
+        </div>
+      </div>
+      <!--Botão Sair do Sistema-->
+      <button class="btn-logout" onclick="handleLogout()" title="Sair do sistema">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+          <polyline points="16 17 21 12 16 7"></polyline>
+          <line x1="21" y1="12" x2="9" y2="12"></line>
+        </svg>
+      </button>
+    </div>
+
+  </aside>
+
+  <!-- Backdrop overlay para fechar o menu no celular -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+  <!-- Main Content -->
+  <main class="main-content" id="mainContent">
+    <!-- Top Bar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Abrir menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
+        <div class="page-breadcrumb">
+          <span id="breadcrumbText">Dashboard</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="search-container" id="globalSearchContainer">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.35-4.35" />
+          </svg>
+          <input type="text" id="globalSearch" placeholder="Buscar equipamentos, colaboradores..." autocomplete="off" />
+          <div class="search-results" id="searchResults"></div>
+        </div>
+        <button class="topbar-btn notification-btn" id="notifBtn" aria-label="Notificações">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+          </svg>
+          <span class="notif-dot" id="notifDot"></span>
+        </button>
+        <!-- Badge de Sincronização em Nuvem (Supabase) -->
+        <div class="cloud-status-badge local" id="cloudStatusBadge" onclick="navigateTo('configuracoes')" title="Sincronização em Nuvem (Supabase)">
+          <span class="cloud-status-dot"></span>
+          <span class="cloud-status-text">Modo Local</span>
+        </div>
+        <div class="topbar-date" id="topbarDate"></div>
+      </div>
+    </header>
+
+    <!-- Pages Container -->
+    <div class="pages-container">
+
+      <!-- ============ DASHBOARD PAGE ============ -->
+      <section class="page active" id="page-dashboard">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Dashboard</h1>
+            <p class="page-subtitle" id="dashGreeting">Bem-vindo ao sistema de inventário de TI</p>
+          </div>
+          <button class="btn btn-primary" onclick="openModal('modalEquipamento')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            Novo Equipamento
+          </button>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+          <div class="stat-card" id="statTotal">
+            <div class="stat-icon stat-icon-blue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="3" width="20" height="14" rx="2" />
+                <path d="M8 21h8M12 17v4" />
+              </svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">Total de Equipamentos</span>
+              <span class="stat-value" id="statTotalVal">0</span>
+              <span class="stat-change" id="statTotalChange"></span>
+            </div>
+          </div>
+          <div class="stat-card" id="statAtivos">
+            <div class="stat-icon stat-icon-green">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">Em Uso / Ativos</span>
+              <span class="stat-value" id="statAtivosVal">0</span>
+              <span class="stat-change stat-change-good" id="statAtivosChange"></span>
+            </div>
+          </div>
+          <div class="stat-card" id="statManutencao">
+            <div class="stat-icon stat-icon-yellow">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path
+                  d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+              </svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">Em Manutenção</span>
+              <span class="stat-value" id="statManutencaoVal">0</span>
+              <span class="stat-change stat-change-warn" id="statManutencaoChange"></span>
+            </div>
+          </div>
+          <div class="stat-card" id="statColaboradores">
+            <div class="stat-icon stat-icon-purple">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">Colaboradores</span>
+              <span class="stat-value" id="statColabVal">0</span>
+              <span class="stat-change" id="statColabChange"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="dashboard-row">
+          <div class="dashboard-card chart-card">
+            <div class="card-header">
+              <h3>Distribuição por Categoria</h3>
+            </div>
+            <div class="chart-wrapper">
+              <canvas id="chartCategoria"></canvas>
+              <div class="chart-legend" id="chartCategoriaLegend"></div>
+            </div>
+          </div>
+          <div class="dashboard-card chart-card">
+            <div class="card-header">
+              <h3>Status dos Equipamentos</h3>
+            </div>
+            <div class="chart-wrapper">
+              <canvas id="chartStatus"></canvas>
+              <div class="chart-legend" id="chartStatusLegend"></div>
+            </div>
+          </div>
+          <div class="dashboard-card activity-card">
+            <div class="card-header">
+              <h3>Atividade Recente</h3>
+            </div>
+            <div class="activity-list" id="activityList">
+              <div class="empty-activity">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p>Nenhuma atividade registrada</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Equipment Table -->
+        <div class="dashboard-card">
+          <div class="card-header">
+            <h3>Equipamentos Recentes</h3>
+            <a href="#" onclick="navigateTo('equipamentos')" class="card-link">Ver todos &rarr;</a>
+          </div>
+          <div class="table-container">
+            <table class="data-table" id="dashRecentTable">
+              <thead>
+                <tr>
+                  <th>Patrimônio</th>
+                  <th>Descrição</th>
+                  <th>Categoria</th>
+                  <th>Responsável</th>
+                  <th>Status</th>
+                  <th>Localização</th>
+                </tr>
+              </thead>
+              <tbody id="dashRecentTableBody">
+                <tr>
+                  <td colspan="6" class="empty-row">Nenhum equipamento cadastrado</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ EQUIPAMENTOS PAGE ============ -->
+      <section class="page" id="page-equipamentos">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Equipamentos</h1>
+            <p class="page-subtitle">Gerencie todos os ativos de TI</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-secondary" onclick="exportarCSV()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7,10 12,15 17,10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              Exportar CSV
+            </button>
+            <button class="btn btn-primary" onclick="openModal('modalEquipamento')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              Novo Equipamento
+            </button>
+          </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filter-bar">
+          <div class="filter-search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.35-4.35" />
+            </svg>
+            <input type="text" id="filterEquip" placeholder="Buscar por patrimônio, descrição, marca..."
+              oninput="filtrarEquipamentos()" />
+          </div>
+          <select id="filterCategoria" onchange="filtrarEquipamentos()" class="filter-select">
+            <option value="">Todas as categorias</option>
+            <option value="Desktop">Desktop</option>
+            <option value="Notebook">Notebook</option>
+            <option value="Monitor">Monitor</option>
+            <option value="Impressora">Impressora</option>
+            <option value="Switch">Switch</option>
+            <option value="Roteador">Roteador</option>
+            <option value="Servidor">Servidor</option>
+            <option value="Telefone IP">Telefone IP</option>
+            <option value="Tablet">Tablet</option>
+            <option value="Projetor">Projetor</option>
+            <option value="No-break / UPS">No-break / UPS</option>
+            <option value="Periférico">Periférico</option>
+            <option value="Celular">Celular</option>
+            <option value="Outro">Outro</option>
+          </select>
+          <select id="filterStatus" onchange="filtrarEquipamentos()" class="filter-select">
+            <option value="">Todos os status</option>
+            <option value="Ativo">Ativo</option>
+            <option value="Em Manutenção">Em Manutenção</option>
+            <option value="Inativo">Inativo</option>
+            <option value="Descartado">Descartado</option>
+            <option value="Reserva">Reserva</option>
+          </select>
+          <select id="filterLocalSelect" onchange="filtrarEquipamentos()" class="filter-select">
+            <option value="">Todos os locais</option>
+          </select>
+          <button class="btn btn-ghost" onclick="limparFiltros()">Limpar</button>
+        </div>
+
+        <!-- Results count -->
+        <div class="results-info" id="equipResultsInfo"></div>
+
+        <!-- Equipamentos Table -->
+        <div class="dashboard-card table-card">
+          <div class="table-container">
+            <table class="data-table" id="equipTable">
+              <thead>
+                <tr>
+                  <th onclick="sortTable('patrimonio')" class="sortable">Patrimônio <span
+                      class="sort-icon">&#8597;</span></th>
+                  <th onclick="sortTable('descricao')" class="sortable">Descrição <span class="sort-icon">&#8597;</span>
+                  </th>
+                  <th onclick="sortTable('categoria')" class="sortable">Categoria <span class="sort-icon">&#8597;</span>
+                  </th>
+                  <th>Marca / Modelo</th>
+                  <th onclick="sortTable('responsavel')" class="sortable">Responsável <span
+                      class="sort-icon">&#8597;</span></th>
+                  <th>Localização</th>
+                  <th onclick="sortTable('status')" class="sortable">Status <span class="sort-icon">&#8597;</span></th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="equipTableBody">
+                <tr>
+                  <td colspan="8" class="empty-row">Nenhum equipamento cadastrado</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="pagination" id="equipPagination"></div>
+        </div>
+      </section>
+
+      <!-- ============ COLABORADORES PAGE ============ -->
+      <section class="page" id="page-colaboradores">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Colaboradores</h1>
+            <p class="page-subtitle">Gerencie os responsáveis pelos ativos</p>
+          </div>
+          <button class="btn btn-primary" onclick="openModal('modalColaborador')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            Novo Colaborador
+          </button>
+        </div>
+
+        <div class="filter-bar">
+          <div class="filter-search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.35-4.35" />
+            </svg>
+            <input type="text" id="filterColab" placeholder="Buscar por nome, setor, cargo..."
+              oninput="filtrarColaboradores()" />
+          </div>
+          <select id="filterSetor" onchange="filtrarColaboradores()" class="filter-select">
+            <option value="">Todos os setores</option>
+          </select>
+        </div>
+
+        <div class="colabs-grid" id="colabsGrid">
+          <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+            <p>Nenhum colaborador cadastrado</p>
+            <button class="btn btn-primary" onclick="openModal('modalColaborador')">Adicionar Colaborador</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ MOVIMENTAÇÕES PAGE ============ -->
+      <section class="page" id="page-movimentacoes">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Movimentações</h1>
+            <p class="page-subtitle">Histórico de transferências e atribuições</p>
+          </div>
+          <button class="btn btn-primary" onclick="openModal('modalMovimentacao')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            Nova Movimentação
+          </button>
+        </div>
+
+        <div class="filter-bar">
+          <div class="filter-search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.35-4.35" />
+            </svg>
+            <input type="text" id="filterMov" placeholder="Buscar movimentações..." oninput="filtrarMovimentacoes()" />
+          </div>
+          <select id="filterTipoMov" onchange="filtrarMovimentacoes()" class="filter-select">
+            <option value="">Todos os tipos</option>
+            <option value="Entrada">Entrada</option>
+            <option value="Saída">Saída</option>
+            <option value="Transferência">Transferência</option>
+            <option value="Manutenção">Manutenção</option>
+            <option value="Retorno">Retorno</option>
+            <option value="Descarte">Descarte</option>
+          </select>
+          <input type="date" id="filterMovData" onchange="filtrarMovimentacoes()" class="filter-input" />
+        </div>
+
+        <div class="dashboard-card table-card">
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Tipo</th>
+                  <th>Equipamento</th>
+                  <th>De</th>
+                  <th>Para</th>
+                  <th>Responsável</th>
+                  <th>Observação</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="movTableBody">
+                <tr>
+                  <td colspan="8" class="empty-row">Nenhuma movimentação registrada</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="pagination" id="movPagination"></div>
+        </div>
+      </section>
+
+      <!-- ============ RELATÓRIOS PAGE ============ -->
+      <section class="page" id="page-relatorios">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Relatórios</h1>
+            <p class="page-subtitle">Análises e exportações do inventário</p>
+          </div>
+        </div>
+
+        <div class="relatorios-grid">
+          <div class="relatorio-card" onclick="gerarRelatorio('geral')">
+            <div class="relatorio-icon" style="background: linear-gradient(135deg, #06b6d4, #0284c7)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14,2 14,8 20,8" />
+              </svg>
+            </div>
+            <h3>Relatório Geral</h3>
+            <p>Visão completa de todos os equipamentos cadastrados</p>
+            <span class="relatorio-btn">Gerar Relatório &rarr;</span>
+          </div>
+
+          <div class="relatorio-card" onclick="gerarRelatorio('categoria')">
+            <div class="relatorio-icon" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21.21 15.89A10 10 0 1 1 8 2.83" />
+                <path d="M22 12A10 10 0 0 0 12 2v10z" />
+              </svg>
+            </div>
+            <h3>Por Categoria</h3>
+            <p>Distribuição e quantitativo por tipo de equipamento</p>
+            <span class="relatorio-btn">Gerar Relatório &rarr;</span>
+          </div>
+
+          <div class="relatorio-card" onclick="gerarRelatorio('colaborador')">
+            <div class="relatorio-icon" style="background: linear-gradient(135deg, #10b981, #059669)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+            </div>
+            <h3>Por Colaborador</h3>
+            <p>Equipamentos atribuídos a cada colaborador</p>
+            <span class="relatorio-btn">Gerar Relatório &rarr;</span>
+          </div>
+
+          <div class="relatorio-card" onclick="gerarRelatorio('manutencao')">
+            <div class="relatorio-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path
+                  d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+              </svg>
+            </div>
+            <h3>Manutenções</h3>
+            <p>Histórico e status de equipamentos em manutenção</p>
+            <span class="relatorio-btn">Gerar Relatório &rarr;</span>
+          </div>
+
+          <div class="relatorio-card" onclick="exportarCSV()">
+            <div class="relatorio-icon" style="background: linear-gradient(135deg, #ef4444, #dc2626)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7,10 12,15 17,10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+            </div>
+            <h3>Exportar CSV</h3>
+            <p>Exportar todos os dados em formato CSV/Excel</p>
+            <span class="relatorio-btn">Exportar &rarr;</span>
+          </div>
+
+          <div class="relatorio-card" onclick="gerarRelatorio('local')">
+            <div class="relatorio-icon" style="background: linear-gradient(135deg, #ec4899, #db2777)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                <circle cx="12" cy="10" r="3" />
+              </svg>
+            </div>
+            <h3>Por Localização</h3>
+            <p>Distribuição de equipamentos por setor/sala</p>
+            <span class="relatorio-btn">Gerar Relatório &rarr;</span>
+          </div>
+        </div>
+
+        <!-- Report Output -->
+        <div class="dashboard-card" id="relatorioOutput" style="display:none">
+          <div class="card-header">
+            <h3 id="relatorioTitulo">Relatório</h3>
+            <div class="header-actions">
+              <button class="btn btn-secondary" onclick="imprimirRelatorio()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="6,9 6,2 18,2 18,9" />
+                  <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+                  <rect x="6" y="14" width="12" height="8" />
+                </svg>
+                Imprimir
+              </button>
+              <button class="btn btn-ghost"
+                onclick="document.getElementById('relatorioOutput').style.display='none'">&#10005; Fechar</button>
+            </div>
+          </div>
+          <div id="relatorioConteudo"></div>
+        </div>
+      </section>
+
+      <!-- ============ MANUTENÇÃO PAGE ============ -->
+      <section class="page" id="page-manutencao">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Manutenção</h1>
+            <p class="page-subtitle">Controle de equipamentos em manutenção</p>
+          </div>
+          <button class="btn btn-primary" onclick="abrirNovaManutencao()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            Registrar Manutenção
+          </button>
+        </div>
+
+        <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr)">
+          <div class="stat-card">
+            <div class="stat-icon stat-icon-yellow">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12,6 12,12 16,14" />
+              </svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">Em Manutenção</span>
+              <span class="stat-value" id="manuEmAndamento">0</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon stat-icon-green">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">Concluídas (total)</span>
+              <span class="stat-value" id="manuConcluidas">0</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon stat-icon-blue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              </svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">Custo Total (R$)</span>
+              <span class="stat-value" id="manuCusto">R$ 0,00</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-card table-card">
+          <div class="card-header">
+            <h3>Ordens de Manutenção</h3>
+            <select id="filterManuStatus" onchange="filtrarManutencoes()" class="filter-select">
+              <option value="">Todos os status</option>
+              <option value="Aberta">Aberta</option>
+              <option value="Em andamento">Em andamento</option>
+              <option value="Concluída">Concluída</option>
+              <option value="Cancelada">Cancelada</option>
+            </select>
+          </div>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>OS N&ordm;</th>
+                  <th>Data Abertura</th>
+                  <th>Equipamento</th>
+                  <th>Defeito Reportado</th>
+                  <th>Técnico</th>
+                  <th>Custo (R$)</th>
+                  <th>Status</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="manuTableBody">
+                <tr>
+                  <td colspan="8" class="empty-row">Nenhuma manutenção registrada</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ CONFIGURAÇÕES PAGE ============ -->
+      <section class="page" id="page-configuracoes">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Configurações</h1>
+            <p class="page-subtitle">Personalize o sistema</p>
+          </div>
+        </div>
+
+        <div class="config-grid">
+          <!-- Card de Conexão com Nuvem (Supabase) -->
+          <div class="dashboard-card config-card" style="grid-column: 1 / -1; border-color: rgba(6, 182, 212, 0.3); background: linear-gradient(180deg, rgba(6, 182, 212, 0.05) 0%, var(--bg-card) 100%);">
+            <div class="card-header-flex">
+              <h3 class="config-section-title" style="margin-bottom: 0;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent);">
+                  <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
+                </svg>
+                Nuvem &amp; Sincronização em Tempo Real (Supabase)
+              </h3>
+              <span class="status-pill status-local" id="supabaseConfigBadge">Modo Local</span>
+            </div>
+            <p class="config-desc">
+              Conecte seu banco de dados PostgreSQL do Supabase para acessar e sincronizar equipamentos em tempo real entre o computador e celulares.
+            </p>
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label class="form-label">Project URL (Supabase)</label>
+                <input type="text" class="form-input" id="supabaseUrlInput" placeholder="Ex: https://xyzcompany.supabase.co" autocomplete="off" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">API Key Pública ('anon' / 'publishable')</label>
+                <div class="password-field-wrap">
+                  <input type="password" class="form-input" id="supabaseKeyInput" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6Ikp..." autocomplete="off" />
+                  <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('supabaseKeyInput')" title="Mostrar/ocultar chave">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <small style="color: var(--text-muted); font-size: 11px; margin-top: -6px; display: block; margin-bottom: 12px;">
+              📍 No Supabase: <strong>Project Settings &gt; API &gt; Project URL e Project API Keys (anon public)</strong>. Use a URL base do projeto (ex: <code>https://xyzcompany.supabase.co</code>, <em>sem</em> <code>/rest/v1/</code>).
+            </small>
+
+            <div class="cloud-actions-row">
+              <button class="btn btn-primary" onclick="salvarSupabaseConfig()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                  <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                  <polyline points="7 3 7 8 15 8"></polyline>
+                </svg>
+                Salvar &amp; Conectar
+              </button>
+              <button class="btn btn-secondary" onclick="testarSupabaseConfig()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                </svg>
+                Testar Conexão
+              </button>
+              <button class="btn btn-ghost" onclick="desconectarSupabase()" title="Desconectar da nuvem e usar armazenamento do navegador">
+                Desconectar
+              </button>
+            </div>
+
+            <div class="cloud-sync-buttons">
+              <button class="btn btn-secondary btn-sm" onclick="subirDadosSupabase()" title="Envia todo o inventário local do PC para a nuvem">
+                ⬆️ Subir Dados Locais para Nuvem
+              </button>
+              <button class="btn btn-secondary btn-sm" onclick="baixarDadosSupabase()" title="Baixa todos os registros da nuvem e atualiza esta tela">
+                ⬇️ Baixar Dados da Nuvem
+              </button>
+              <button class="btn btn-secondary btn-sm" onclick="abrirModalSQLSupabase()" title="Visualizar e copiar o código SQL para criar as tabelas no Supabase">
+                📋 Ver Script SQL para o Supabase
+              </button>
+            </div>
+          </div>
+
+          <div class="dashboard-card config-card">
+            <h3 class="config-section-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+              Perfil do Administrador
+            </h3>
+            <div class="form-group">
+              <label class="form-label">Nome</label>
+              <input type="text" class="form-input" id="configNome" placeholder="Nome do administrador" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Empresa</label>
+              <input type="text" class="form-input" id="configEmpresa" placeholder="Nome da empresa" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Setor</label>
+              <input type="text" class="form-input" id="configSetor" placeholder="Ex: Tecnologia da Informação" />
+            </div>
+            <button class="btn btn-primary" onclick="salvarConfiguracoes()">Salvar Perfil</button>
+          </div>
+
+          <div class="dashboard-card config-card">
+            <h3 class="config-section-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                <circle cx="12" cy="10" r="3" />
+              </svg>
+              Localizações / Setores Físicos
+            </h3>
+            <div class="tag-manager">
+              <div class="tag-list" id="tagLocais"></div>
+              <div class="tag-input-row">
+                <input type="text" class="form-input" id="novaLocalizacao" placeholder="Ex: Sala de Reuniões A"
+                  onkeydown="if(event.key==='Enter') adicionarLocalizacao()" />
+                <button class="btn btn-primary" onclick="adicionarLocalizacao()">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="dashboard-card config-card">
+            <h3 class="config-section-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="7" width="20" height="14" rx="2" />
+                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+              </svg>
+              Setores da Empresa
+            </h3>
+            <div class="tag-manager">
+              <div class="tag-list" id="tagSetores"></div>
+              <div class="tag-input-row">
+                <input type="text" class="form-input" id="novoSetor" placeholder="Ex: Financeiro"
+                  onkeydown="if(event.key==='Enter') adicionarSetor()" />
+                <button class="btn btn-primary" onclick="adicionarSetor()">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="dashboard-card config-card">
+            <h3 class="config-section-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+              Segurança &amp; Controle de Acesso
+            </h3>
+            <p class="config-desc">Altere as credenciais do administrador e tempo de inatividade.</p>
+            <div class="form-group">
+              <label class="form-label">Usuário de Login</label>
+              <input type="text" class="form-input" id="authUsuarioInput" placeholder="Ex: admin" autocomplete="username" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Senha Atual (obrigatória)</label>
+              <div class="password-field-wrap">
+                <input type="password" class="form-input" id="authSenhaAtualInput" placeholder="Digite a senha atual" autocomplete="current-password" />
+                <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('authSenhaAtualInput')" title="Mostrar/ocultar senha">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nova Senha (deixe em branco se não quiser alterar)</label>
+              <div class="password-field-wrap">
+                <input type="password" class="form-input" id="authNovaSenhaInput" placeholder="Digite a nova senha" oninput="checkPasswordStrength(this.value)" autocomplete="new-password" />
+                <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('authNovaSenhaInput')" title="Mostrar/ocultar senha">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                </button>
+              </div>
+              <div class="password-strength-meter">
+                <div class="strength-bar" id="strengthBar"></div>
+              </div>
+              <small class="strength-label" id="strengthLabel">Mínimo 6 caracteres recomendados</small>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Confirmar Nova Senha</label>
+              <div class="password-field-wrap">
+                <input type="password" class="form-input" id="authConfirmaSenhaInput" placeholder="Confirme a nova senha" autocomplete="new-password" />
+                <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility('authConfirmaSenhaInput')" title="Mostrar/ocultar senha">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Bloqueio Automático por Inatividade</label>
+              <select class="form-input" id="authAutoLogoutSelect">
+                <option value="0">Desativado</option>
+                <option value="5">5 minutos</option>
+                <option value="15">15 minutos (Recomendado)</option>
+                <option value="30">30 minutos</option>
+                <option value="60">1 hora</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" onclick="salvarSeguranca()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+              Atualizar Segurança
+            </button>
+          </div>
+
+          <div class="dashboard-card config-card">
+            <h3 class="config-section-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="1,4 1,10 7,10" />
+                <polyline points="23,20 23,14 17,14" />
+                <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15" />
+              </svg>
+              Backup &amp; Restauração
+            </h3>
+            <p class="config-desc">Exporte ou importe todos os dados do sistema.</p>
+            <div class="backup-actions">
+              <button class="btn btn-secondary" onclick="exportarBackup()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7,10 12,15 17,10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                Exportar Backup
+              </button>
+              <label class="btn btn-secondary" for="importBackupFile" style="cursor:pointer">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7,10 12,15 17,10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                Importar Backup
+              </label>
+              <input type="file" id="importBackupFile" accept=".json" style="display:none"
+                onchange="importarBackup(event)" />
+            </div>
+            <div class="backup-actions" style="margin-top:12px">
+              <button class="btn btn-danger" onclick="confirmarLimparDados()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3,6 5,6 21,6" />
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                </svg>
+                Limpar Todos os Dados
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ============ MODALS ============ -->
+
+  <!-- Modal Equipamento -->
+  <div class="modal-overlay" id="modalEquipamento">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <h2 id="modalEquipTitulo">Novo Equipamento</h2>
+        <button class="modal-close" onclick="closeModal('modalEquipamento')" aria-label="Fechar">&#10005;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="equipId" />
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label required">N&ordm; de Patrimônio</label>
+            <input type="text" class="form-input" id="equipPatrimonio" placeholder="Ex: TI-001" />
+          </div>
+          <div class="form-group">
+            <label class="form-label required">Categoria</label>
+            <select class="form-input" id="equipCategoria">
+              <option value="">Selecione...</option>
+              <option>Desktop</option>
+              <option>Notebook</option>
+              <option>Monitor</option>
+              <option>Impressora</option>
+              <option>Switch</option>
+              <option>Roteador</option>
+              <option>Servidor</option>
+              <option>Telefone IP</option>
+              <option>Tablet</option>
+              <option>Projetor</option>
+              <option>No-break / UPS</option>
+              <option>Celular</option>
+              <option>Periférico</option>
+              <option>Outro</option>
+            </select>
+          </div>
+          <div class="form-group span-2">
+            <label class="form-label required">Descrição</label>
+            <input type="text" class="form-input" id="equipDescricao" placeholder="Ex: Computador Dell Optiplex 3090" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Marca</label>
+            <input type="text" class="form-input" id="equipMarca" placeholder="Ex: Dell, HP, Lenovo..." />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Modelo</label>
+            <input type="text" class="form-input" id="equipModelo" placeholder="Ex: Optiplex 3090" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Número de Série</label>
+            <input type="text" class="form-input" id="equipSerial" placeholder="S/N do equipamento" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">N&ordm; NF / Invoice</label>
+            <input type="text" class="form-input" id="equipNF" placeholder="Número da nota fiscal" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Data de Aquisição</label>
+            <input type="date" class="form-input" id="equipDataAquisicao" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Valor de Aquisição (R$)</label>
+            <input type="number" class="form-input" id="equipValor" placeholder="0,00" step="0.01" min="0" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Responsável</label>
+            <select class="form-input" id="equipResponsavel">
+              <option value="">Nenhum / Disponível</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Localização</label>
+            <select class="form-input" id="equipLocalizacao">
+              <option value="">Selecione a localização</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label required">Status</label>
+            <select class="form-input" id="equipStatus">
+              <option value="Ativo">Ativo</option>
+              <option value="Em Manutenção">Em Manutenção</option>
+              <option value="Inativo">Inativo</option>
+              <option value="Descartado">Descartado</option>
+              <option value="Reserva">Reserva</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Garantia até</label>
+            <input type="date" class="form-input" id="equipGarantia" />
+          </div>
+          <div class="form-group span-2">
+            <label class="form-label">Especificações Técnicas</label>
+            <textarea class="form-input" id="equipEspecificacoes" rows="2"
+              placeholder="Ex: Intel Core i5, 8GB RAM, SSD 256GB..."></textarea>
+          </div>
+          <div class="form-group span-2">
+            <label class="form-label">Observações</label>
+            <textarea class="form-input" id="equipObservacoes" rows="2" placeholder="Observações gerais..."></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('modalEquipamento')">Cancelar</button>
+        <button class="btn btn-primary" onclick="salvarEquipamento()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+            <polyline points="17,21 17,13 7,13 7,21" />
+            <polyline points="7,3 7,8 15,8" />
+          </svg>
+          Salvar Equipamento
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Colaborador -->
+  <div class="modal-overlay" id="modalColaborador">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modalColabTitulo">Novo Colaborador</h2>
+        <button class="modal-close" onclick="closeModal('modalColaborador')" aria-label="Fechar">&#10005;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="colabId" />
+        <div class="form-grid-2">
+          <div class="form-group span-2">
+            <label class="form-label required">Nome Completo</label>
+            <input type="text" class="form-input" id="colabNome" placeholder="Nome do colaborador" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Cargo</label>
+            <input type="text" class="form-input" id="colabCargo" placeholder="Ex: Analista de Sistemas" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Setor / Departamento</label>
+            <select class="form-input" id="colabSetor">
+              <option value="">Selecione o setor</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">E-mail</label>
+            <input type="email" class="form-input" id="colabEmail" placeholder="email@empresa.com.br" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Telefone / Ramal</label>
+            <input type="text" class="form-input" id="colabTelefone" placeholder="(00) 0000-0000" />
+          </div>
+          <div class="form-group span-2">
+            <label class="form-label">Matrícula / ID Interno</label>
+            <input type="text" class="form-input" id="colabMatricula" placeholder="Ex: 12345" />
+          </div>
+          <div class="form-group span-2">
+            <label class="form-label">Observações</label>
+            <textarea class="form-input" id="colabObs" rows="2"
+              placeholder="Observações sobre o colaborador..."></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('modalColaborador')">Cancelar</button>
+        <button class="btn btn-primary" onclick="salvarColaborador()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+            <polyline points="17,21 17,13 7,13 7,21" />
+            <polyline points="7,3 7,8 15,8" />
+          </svg>
+          Salvar Colaborador
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Movimentação -->
+  <div class="modal-overlay" id="modalMovimentacao">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Nova Movimentação</h2>
+        <button class="modal-close" onclick="closeModal('modalMovimentacao')" aria-label="Fechar">&#10005;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label required">Equipamento</label>
+            <select class="form-input" id="movEquipamento">
+              <option value="">Selecione o equipamento...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label required">Tipo de Movimentação</label>
+            <select class="form-input" id="movTipo">
+              <option value="">Selecione...</option>
+              <option>Entrada</option>
+              <option>Saída</option>
+              <option>Transferência</option>
+              <option>Manutenção</option>
+              <option>Retorno</option>
+              <option>Descarte</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">De (Responsável/Local)</label>
+            <input type="text" class="form-input" id="movDe" placeholder="Origem" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Para (Responsável/Local)</label>
+            <input type="text" class="form-input" id="movPara" placeholder="Destino" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Responsável pela Movimentação</label>
+            <select class="form-input" id="movResponsavel">
+              <option value="">Selecione...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Data</label>
+            <input type="date" class="form-input" id="movData" />
+          </div>
+          <div class="form-group span-2">
+            <label class="form-label">Observação</label>
+            <textarea class="form-input" id="movObs" rows="2" placeholder="Detalhes da movimentação..."></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('modalMovimentacao')">Cancelar</button>
+        <button class="btn btn-primary" onclick="salvarMovimentacao()">Registrar Movimentação</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Manutenção -->
+  <div class="modal-overlay" id="modalManutencao">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modalManuTitulo">Nova Ordem de Manutenção</h2>
+        <button class="modal-close" onclick="closeModal('modalManutencao')" aria-label="Fechar">&#10005;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="manuId" />
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label required">Equipamento</label>
+            <select class="form-input" id="manuEquipamento">
+              <option value="">Selecione...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Técnico Responsável</label>
+            <input type="text" class="form-input" id="manuTecnico" placeholder="Nome do técnico" />
+          </div>
+          <div class="form-group span-2">
+            <label class="form-label required">Defeito / Problema Reportado</label>
+            <textarea class="form-input" id="manuDefeito" rows="2" placeholder="Descreva o defeito..."></textarea>
+          </div>
+          <div class="form-group span-2">
+            <label class="form-label">Serviço Realizado</label>
+            <textarea class="form-input" id="manuServico" rows="2"
+              placeholder="Descreva o serviço realizado..."></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Custo (R$)</label>
+            <input type="number" class="form-input" id="manuCustoInput" placeholder="0,00" step="0.01" min="0" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Status da OS</label>
+            <select class="form-input" id="manuStatusInput">
+              <option value="Aberta">Aberta</option>
+              <option value="Em andamento">Em andamento</option>
+              <option value="Concluída">Concluída</option>
+              <option value="Cancelada">Cancelada</option>
+            </select>
+          </div>
+          <div class="form-group span-2">
+            <label class="form-label">Observações</label>
+            <textarea class="form-input" id="manuObs" rows="2" placeholder="Observações adicionais..."></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('modalManutencao')">Cancelar</button>
+        <button class="btn btn-primary" onclick="salvarManutencao()">Salvar OS</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Detalhe Equipamento -->
+  <div class="modal-overlay" id="modalDetalhe">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <h2>Detalhes do Equipamento</h2>
+        <button class="modal-close" onclick="closeModal('modalDetalhe')" aria-label="Fechar">&#10005;</button>
+      </div>
+      <div class="modal-body" id="modalDetalheBody"></div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('modalDetalhe')">Fechar</button>
+        <button class="btn btn-secondary" id="btnEditarDetalhe">Editar Equipamento</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Confirm -->
+  <div class="modal-overlay" id="modalConfirm">
+    <div class="modal modal-sm">
+      <div class="modal-header">
+        <h2 id="confirmTitulo">Confirmar ação</h2>
+        <button class="modal-close" onclick="closeModal('modalConfirm')" aria-label="Fechar">&#10005;</button>
+      </div>
+      <div class="modal-body">
+        <p id="confirmMensagem" style="color: var(--text-secondary); line-height: 1.6;"></p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('modalConfirm')">Cancelar</button>
+        <button class="btn btn-danger" id="confirmBtn">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Script SQL Supabase -->
+  <div class="modal-overlay" id="modalSupabaseSQL">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <h2>Script SQL para o Supabase</h2>
+        <button class="modal-close" onclick="closeModal('modalSupabaseSQL')" aria-label="Fechar">&#10005;</button>
+      </div>
+      <div class="modal-body">
+        <p style="color: var(--text-secondary); margin-bottom: 12px; font-size: 13px;">
+          Copie e cole este script no <strong>SQL Editor</strong> do seu painel do Supabase e clique em <strong>Run</strong>. Ele cria as tabelas de equipamentos, colaboradores, movimentações, ordens de serviço e ativa a sincronização em tempo real (Realtime).
+        </p>
+        <div style="position: relative;">
+          <textarea id="sqlSupabaseContent" class="form-input" rows="14" style="font-family: monospace; font-size: 12px; white-space: pre;" readonly></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('modalSupabaseSQL')">Fechar</button>
+        <button class="btn btn-primary" onclick="copiarSQLClipboard()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+          Copiar Código SQL
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Supabase JS Client v2 -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/data.js"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/app.js"></script>
+</body>
+
+</html>
